@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Album</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 600px; margin: auto; padding: 20px; }
+        input[type="text"] { width: 100%; padding: 10px; margin: 10px 0; }
+        button { padding: 10px 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Spotify Album</h1>
+        <input type="text" id="songTitle" placeholder="Enter song title">
+        <button onclick="searchSong()">Search</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function searchSong() {
+            const songTitle = document.getElementById('songTitle').value;
+            const response = await fetch('/spotify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ query: songTitle })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                document.getElementById('result').innerHTML = `
+                    <h2>${data.title}</h2>
+                    <p>${data.lyrics}</p>
+                    <audio controls src="${data.audioFile}"></audio>
+                    <p><a href="${data.downloadLink}" download>Download</a></p>
+                `;
+            } else {
+                document.getElementById('result').innerText = data.error;
+            }
+        }
+    </script>
+</body>
+</html>
