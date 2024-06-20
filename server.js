@@ -2,7 +2,6 @@ const express = require('express');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const { spotify, spotifydl } = require('betabotz-tools');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,17 +22,20 @@ app.post('/spotify', async (req, res) => {
 
         const searchResponse = await axios.get(`https://lyrist.vercel.app/api/${encodeURI(query)}`);
         const { lyrics, title } = searchResponse.data;
-        const results = await spotify(encodeURI(query));
-        const songUrl = results.result.data[0].url;
-        const downloadResponse = await spotifydl(songUrl);
-        const songData = (await axios.get(downloadResponse.result, { responseType: 'arraybuffer' })).data;
+        
+        // Assuming an alternative way to get song URL and download link
+        // const songUrl = ...;
+        // const downloadResponse = ...;
+
+        // Instead of using spotifydl, we use axios directly if we have the URL
+        const songData = (await axios.get(songUrl, { responseType: 'arraybuffer' })).data;
 
         fs.writeFileSync(CACHE_PATH, Buffer.from(songData, 'utf-8'));
 
         res.send({
             title,
             lyrics,
-            downloadLink: downloadResponse.result,
+            downloadLink: songUrl, // Change this to the actual download link
             audioFile: '/cache/spotify.mp3'
         });
     } catch (error) {
