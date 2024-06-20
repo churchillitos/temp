@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YOUR INFORMATION</title>
+    <title>Your Info</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -57,18 +57,17 @@
         <p>Organization: <span id="org">Loading...</span></p>
         <p>Postal Code: <span id="postal">Loading...</span></p>
         <p>Timezone: <span id="timezone">Loading...</span></p>
-        <p>Ping: <span id="ping">Loading...</span></p>
         <p>Time: <span id="time">Loading...</span></p>
         <p>Date: <span id="date">Loading...</span></p>
         <footer>
-            &copy; 2024 <a href="https://www.facebook.com/Churchill.Dev4100">Churchill Abing</a>. All rights reserved.
+            &copy; 2024 <a href="https://your-website.com">YourName</a>. All rights reserved.
         </footer>
     </div>
 
     <script>
         async function fetchIPInfo() {
             try {
-                const response = await fetch('https://ipinfo.io/json?token=60117f9430a2b5');
+                const response = await fetch('https://ipinfo.io/json?token=your_api_token');
                 const data = await response.json();
 
                 document.getElementById('ip').textContent = data.ip;
@@ -79,21 +78,20 @@
                 document.getElementById('org').textContent = data.org;
                 document.getElementById('postal').textContent = data.postal;
                 document.getElementById('timezone').textContent = data.timezone;
-
-                const pingResponse = await fetch(`https://api.ping.pe/${data.ip}`);
-                const pingData = await pingResponse.json();
-                document.getElementById('ping').textContent = `${pingData.ping} ms`;
-
-                const now = new Date();
-                document.getElementById('time').textContent = now.toLocaleTimeString();
-                document.getElementById('date').textContent = now.toLocaleDateString();
-
             } catch (error) {
                 console.error('Error fetching IP info:', error);
             }
         }
 
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('time').textContent = now.toLocaleTimeString();
+            document.getElementById('date').textContent = now.toLocaleDateString();
+        }
+
         fetchIPInfo();
+        updateTime();
+        setInterval(updateTime, 1000);
     </script>
 </body>
 </html>
