@@ -3,95 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Info</title>
+    <title>Image Generator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(to right, #8e2de2, #4a00e0);
+            background-color: #f4f4f4;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            color: #fff;
+            min-height: 100vh;
         }
         .container {
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: #fff;
             border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
             padding: 20px;
             text-align: center;
-            width: 90%;
-            max-width: 400px;
         }
-        .container h1 {
-            margin-top: 0;
+        header {
+            background-color: #4CAF50;
+            border-radius: 10px 10px 0 0;
+            color: white;
+            padding: 15px 0;
+            font-size: 1.5rem;
         }
-        .container p {
+        select, button {
+            padding: 10px;
             margin: 10px 0;
+            font-size: 1rem;
         }
-        .container p span {
-            font-weight: bold;
-        }
-        footer {
+        img {
             margin-top: 20px;
-            font-size: 0.9rem;
+            max-width: 100%;
+            border-radius: 10px;
         }
-        footer a {
-            color: #4CAF50;
-            text-decoration: none;
+        .loader {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
         }
-        footer a:hover {
-            text-decoration: underline;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Your Information & Data</h1>
-        <p>IP: <span id="ip">Loading...</span></p>
-        <p>City: <span id="city">Loading...</span></p>
-        <p>Region: <span id="region">Loading...</span></p>
-        <p>Country: <span id="country">Loading...</span></p>
-        <p>Location: <span id="location">Loading...</span></p>
-        <p>Organization: <span id="org">Loading...</span></p>
-        <p>Postal Code: <span id="postal">Loading...</span></p>
-        <p>Timezone: <span id="timezone">Loading...</span></p>
-        <p>Time: <span id="time">Loading...</span></p>
-        <p>Date: <span id="date">Loading...</span></p>
-        <footer>
-            &copy; 2024 <a href="https://www.facebook.com/Churchill.Dev4100">Churchill Abing</a>. All rights reserved.
-        </footer>
+        <header>
+            Welcome to Image Generator
+        </header>
+        <select id="style-select">
+            <option value="anime">Anime</option>
+            <option value="fantasy">Fantasy</option>
+            <option value="pencil">Pencil</option>
+            <option value="digital">Digital</option>
+            <option value="vintage">Vintage</option>
+            <option value="3d (render)">3D Render</option>
+            <option value="cyberpunk">Cyberpunk</option>
+            <option value="manga">Manga</option>
+            <option value="realistic">Realistic</option>
+            <option value="demonic">Demonic</option>
+            <option value="heavenly">Heavenly</option>
+            <option value="comic">Comic</option>
+            <option value="robotic">Robotic</option>
+        </select>
+        <button onclick="generateImage()">Generate Image</button>
+        <div class="loader" id="loader"></div>
+        <img id="generated-image" src="" alt="Generated Image">
     </div>
 
     <script>
-        async function fetchIPInfo() {
+        async function generateImage() {
+            const style = document.getElementById('style-select').value;
+            const loader = document.getElementById('loader');
+            const image = document.getElementById('generated-image');
+            loader.style.display = 'block';
+            image.style.display = 'none';
+            
             try {
-                const response = await fetch('https://ipinfo.io/json?token=60117f9430a2b5');
+                const response = await fetch('https://deku-rest-api-gadz.onrender.com/sdxl/list', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ style })
+                });
                 const data = await response.json();
-
-                document.getElementById('ip').textContent = data.ip;
-                document.getElementById('city').textContent = data.city;
-                document.getElementById('region').textContent = data.region;
-                document.getElementById('country').textContent = data.country;
-                document.getElementById('location').textContent = data.loc;
-                document.getElementById('org').textContent = data.org;
-                document.getElementById('postal').textContent = data.postal;
-                document.getElementById('timezone').textContent = data.timezone;
+                image.src = data.image_url;
+                image.style.display = 'block';
             } catch (error) {
-                console.error('Error fetching IP info:', error);
+                console.error('Error generating image:', error);
+            } finally {
+                loader.style.display = 'none';
             }
         }
-
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('time').textContent = now.toLocaleTimeString();
-            document.getElementById('date').textContent = now.toLocaleDateString();
-        }
-
-        fetchIPInfo();
-        updateTime();
-        setInterval(updateTime, 1000);
     </script>
 </body>
 </html>
