@@ -1,49 +1,51 @@
 const express = require('express');
-const axios = require('axios');
-const fs = require('fs');
+const { TempMail } = require('1secmail-api');
 const path = require('path');
-
 const app = express();
-const PORT = process.env.PORT || 3000;
-const CACHE_PATH = path.join(__dirname, 'cache', 'spotify.mp3');
+const port = process.env.PORT || 3000;
 
-// Ensure cache directory exists
-if (!fs.existsSync(path.join(__dirname, 'cache'))) {
-    fs.mkdirSync(path.join(__dirname, 'cache'));
+function generateRandomId() {
+    var length = 6;
+    var characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    var randomId = '';
+
+    for (var i = 0; i < length; i++) {
+        randomId += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+
+    return randomId;
 }
 
-app.use(express.static('public'));
-app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.post('/spotify', async (req, res) => {
+app.get('/generate-email', async (req, res) => {
     try {
-        const { query } = req.body;
-        if (!query) return res.status(400).send({ error: 'Missing title of the song' });
-
-        const searchResponse = await axios.get(`https://lyrist.vercel.app/api/${encodeURI(query)}`);
-        const { lyrics, title } = searchResponse.data;
-        
-        // Assuming an alternative way to get song URL and download link
-        // const songUrl = ...;
-        // const downloadResponse = ...;
-
-        // Instead of using spotifydl, we use axios directly if we have the URL
-        const songData = (await axios.get(songUrl, { responseType: 'arraybuffer' })).data;
-
-        fs.writeFileSync(CACHE_PATH, Buffer.from(songData, 'utf-8'));
-
-        res.send({
-            title,
-            lyrics,
-            downloadLink: songUrl, // Change this to the actual download link
-            audioFile: '/cache/spotify.mp3'
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send({ error: 'An error occurred while processing your request.' });
+        const mail = new TempMail(generateRandomId());
+        mail.autoFetch();
+        res.json({ email: mail.address });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+app.get('/check-email', async (req, res) => {
+    const emailId = req.query.id;
+    try {
+        const mail = new TempMail(emailId);
+        const mails = await mail.getMail();
+        if (mails.length > 0) {
+            const b = mails[0];
+            const message = `You have a message!\n\nFrom: ${b.from}\n\nSubject: ${b.subject}\n\nMessage: ${b.textBody}\nDate: ${b.date}`;
+            res.json({ message });
+            await mail.deleteMail();
+        } else {
+            res.json({ message: 'No new messages' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.listen(port, () => {
+    console.log(`Server is running at http://localhost:${port}`);
 });
