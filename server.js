@@ -34,14 +34,13 @@ app.get('/check-email', async (req, res) => {
     try {
         const mail = new TempMail(emailId);
         const mails = await mail.getMail();
-        if (mails.length > 0) {
-            const b = mails[0];
-            const message = `You have a message!\n\nFrom: ${b.from}\n\nSubject: ${b.subject}\n\nMessage: ${b.textBody}\nDate: ${b.date}`;
-            res.json({ message });
-            await mail.deleteMail();
-        } else {
-            res.json({ message: 'No new messages' });
-        }
+        const messages = mails.map(m => ({
+            from: m.from,
+            subject: m.subject,
+            body: m.textBody,
+            date: m.date
+        }));
+        res.json({ messages });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
