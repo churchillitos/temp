@@ -7,54 +7,75 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #1e1e1e;
+            color: white;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
-            background-color: #f0f0f0;
+            margin: 0;
         }
-        #container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
+        h1 {
+            color: #ff0000;
         }
-        #email {
-            font-weight: bold;
-            margin: 20px 0;
+        button, input {
+            padding: 10px 20px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
         }
-        #message {
-            margin-top: 20px;
-            white-space: pre-wrap;
-            text-align: left;
+        button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        input {
+            background-color: #333;
+            color: white;
+        }
+        #generatedEmail, #inboxMessages {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 500px;
+            word-wrap: break-word;
+        }
+        #generatedEmail {
+            border: 2px solid #ff0000;
         }
     </style>
 </head>
 <body>
-    <div id="container">
-        <h1>TempMail Generator</h1>
-        <button onclick="generateEmail()">Generate New Email</button>
-        <div id="email"></div>
-        <button onclick="checkInbox()">Check Inbox</button>
-        <div id="message"></div>
+    <h1>TempMail Generator</h1>
+    <div>
+        <button id="generateEmailBtn">Generate New Email</button>
+        <p id="generatedEmail"></p>
     </div>
-
+    <div>
+        <input type="text" id="inboxCodeInput" placeholder="Enter Inbox Code">
+        <button id="checkInboxBtn">Check Inbox</button>
+        <div id="inboxMessages"></div>
+    </div>
     <script>
-        let emailId = '';
-
-        async function generateEmail() {
+        document.getElementById('generateEmailBtn').addEventListener('click', async () => {
             const response = await fetch('/generate-email');
             const data = await response.json();
-            emailId = data.email.split('@')[0];
-            document.getElementById('email').innerText = `Your temporary email: ${data.email}`;
-        }
+            document.getElementById('generatedEmail').textContent = data.email;
+        });
 
-        async function checkInbox() {
-            const response = await fetch(`/check-email?id=${emailId}`);
+        document.getElementById('checkInboxBtn').addEventListener('click', async () => {
+            const inboxCode = document.getElementById('inboxCodeInput').value;
+            const response = await fetch(`/check-email?id=${inboxCode}`);
             const data = await response.json();
-            document.getElementById('message').innerText = data.message;
-        }
+            document.getElementById('inboxMessages').textContent = data.message || 'No messages found';
+        });
     </script>
 </body>
 </html>
