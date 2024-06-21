@@ -74,7 +74,17 @@
             const inboxCode = document.getElementById('inboxCodeInput').value;
             const response = await fetch(`/check-email?id=${inboxCode}`);
             const data = await response.json();
-            document.getElementById('inboxMessages').textContent = data.message || 'No messages found';
+            const inboxMessagesDiv = document.getElementById('inboxMessages');
+            inboxMessagesDiv.innerHTML = ''; // Clear previous messages
+            if (data.messages && data.messages.length > 0) {
+                data.messages.forEach(message => {
+                    const messageElement = document.createElement('div');
+                    messageElement.textContent = `From: ${message.from} - Subject: ${message.subject} - Body: ${message.body}`;
+                    inboxMessagesDiv.appendChild(messageElement);
+                });
+            } else {
+                inboxMessagesDiv.textContent = 'No messages found';
+            }
         });
     </script>
 </body>
