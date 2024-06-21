@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TempMail Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        #container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        #email {
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        #message {
+            margin-top: 20px;
+            white-space: pre-wrap;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>TempMail Generator</h1>
+        <button onclick="generateEmail()">Generate New Email</button>
+        <div id="email"></div>
+        <button onclick="checkInbox()">Check Inbox</button>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        let emailId = '';
+
+        async function generateEmail() {
+            const response = await fetch('/generate-email');
+            const data = await response.json();
+            emailId = data.email.split('@')[0];
+            document.getElementById('email').innerText = `Your temporary email: ${data.email}`;
+        }
+
+        async function checkInbox() {
+            const response = await fetch(`/check-email?id=${emailId}`);
+            const data = await response.json();
+            document.getElementById('message').innerText = data.message;
+        }
+    </script>
+</body>
+</html>
