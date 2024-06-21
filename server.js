@@ -16,6 +16,7 @@ function generateRandomId() {
     return randomId;
 }
 
+// Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/generate-email', async (req, res) => {
@@ -44,6 +45,11 @@ app.get('/check-email', async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
+});
+
+// Serve index.html for the root path
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.listen(port, () => {
