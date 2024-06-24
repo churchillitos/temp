@@ -1,0 +1,12 @@
+{
+  "name": "tempmail-generator",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "1secmail-api": "^1.0.0"
+  }
+}
