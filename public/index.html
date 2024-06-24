@@ -4,53 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TempMail Generator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #1e1e1e;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-        h1 {
-            color: #ff0000;
-        }
-        button, input {
-            padding: 10px 20px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        button {
-            background-color: #28a745;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-        input {
-            background-color: #333;
-            color: white;
-        }
-        #generatedEmail, #inboxMessages {
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #333;
-            border-radius: 5px;
-            width: 100%;
-            max-width: 500px;
-            word-wrap: break-word;
-        }
-        #generatedEmail {
-            border: 2px solid #ff0000;
-        }
-    </style>
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
     <h1>TempMail Generator</h1>
@@ -66,10 +20,10 @@
         let generatedEmailId;
 
         document.getElementById('generateEmailBtn').addEventListener('click', async () => {
-            const response = await fetch('/generate-email');
+            const response = await fetch('/api/generate-email');
             const data = await response.json();
             document.getElementById('generatedEmail').textContent = data.email;
-            generatedEmailId = data.email.split('@')[0]; // Extract the email ID
+            generatedEmailId = data.email.split('@')[0];
         });
 
         document.getElementById('checkInboxBtn').addEventListener('click', async () => {
@@ -77,10 +31,10 @@
                 document.getElementById('inboxMessages').textContent = 'Please generate an email first.';
                 return;
             }
-            const response = await fetch(`/check-email?id=${generatedEmailId}`);
+            const response = await fetch(`/api/check-email?id=${generatedEmailId}`);
             const data = await response.json();
             const inboxMessagesDiv = document.getElementById('inboxMessages');
-            inboxMessagesDiv.innerHTML = ''; // Clear previous messages
+            inboxMessagesDiv.innerHTML = '';
             if (data.messages && data.messages.length > 0) {
                 data.messages.forEach(message => {
                     const messageElement = document.createElement('div');
